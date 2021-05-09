@@ -1,0 +1,17 @@
+.user {
+	h1 {
+		margin-bottom: 10px;
+		text-transform: uppercase;
+		font-weight: 700;
+	}
+	// .user__error
+	&__error {
+	}
+	// .user__container
+	&__container {
+	}
+	// .user__img
+	&__img {
+		max-width: 280px;
+	}
+}

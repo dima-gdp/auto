@@ -1,22 +1,27 @@
 <template>
-  <div class="container">
-    <h1>Users</h1>
-    <form @submit.prevent="searchUsers">
-      <input type="text" v-model.trim="searchInput">
-      <button type="submit">search</button>
-    </form>
-    <form @submit.prevent="addUser">
-      <input type="text" v-model.trim="userNameInput">
-      <button type="submit">add</button>
-    </form>
-    <div class="error" v-if="error">Ошибка</div>
-    <ul>
-      <li v-for="(user, idx) in filteredUsers" :key="idx">
-        <router-link :to="{name: 'UserPage', params: {id: user.id}}">{{`${user.first_name} ${user.last_name}`}}</router-link>
-        <button type="button" @click="userDelete(user.id)">X</button>
-      </li>
-    </ul>
-  </div>
+  <section class="users">
+    <div class="users__container container">
+      <h1>Пользователи</h1>
+      <form @submit.prevent="searchUsers">
+        <input type="text" v-model.trim="searchInput" placeholder="Имя" />
+        <button type="submit">Поиск</button>
+      </form>
+      <form @submit.prevent="addUser">
+        <input type="text" v-model.trim="userNameInput" placeholder="Имя" />
+        <button type="submit">Добавить</button>
+      </form>
+      <div class="loading" v-if="loading">Загрузка...</div>
+      <div class="error" v-if="error">Ошибка</div>
+      <ul class="users__list">
+        <li v-for="(user, idx) in filteredUsers" :key="idx" class="users__item">
+          <router-link :to="{ name: 'UserPage', params: { id: user.id } }">{{
+            `${user.first_name} ${user.last_name}`
+          }}</router-link>
+          <button type="button" @click="userDelete(user.id)">X</button>
+        </li>
+      </ul>
+    </div>
+  </section>
 </template>
 
 <script>
@@ -24,9 +29,9 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Users',
-  data () {
+  data() {
     return {
-      loading: true,
+      loading: false,
       error: false,
       filteredUsers: [],
       searchInput: '',
@@ -69,7 +74,7 @@ export default {
       this.pushUser(userData)
     }
   },
-  async mounted () {
+  async mounted() {
     this.loading = true
     this.error = false
     try {

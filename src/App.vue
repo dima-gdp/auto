@@ -1,9 +1,13 @@
 <template>
   <div>
-    <nav class="nav container">
-      <router-link :to="{ name: 'Home' }">Range слайдер</router-link>
-      <router-link :to="{ name: 'Users' }">Пользователи</router-link>
-    </nav>
+    <div class="header">
+      <div class="header__container container">
+        <nav class="nav">
+          <router-link :to="{ name: 'HomePage' }">Range слайдер</router-link>
+          <router-link :to="{ name: 'UsersPage' }">Пользователи</router-link>
+        </nav>
+      </div>
+    </div>
     <router-view />
   </div>
 </template>

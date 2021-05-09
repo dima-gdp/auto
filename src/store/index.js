@@ -7,7 +7,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     usersData: [],
-    // Пришлось добавить, так как не могу делать запросы
+    // Пришлось добавить, так как без запросов
     addedUsers: [],
     deletedUsers: []
   },
