@@ -1,8 +1,5 @@
 <template>
   <div class="home container">
-    <nav class="home__nav">
-      <router-link :to="{ name: 'Home' }">Range слайдер</router-link>
-    </nav>
     <div class="home__row">
       <range-slider v-model="price" />
     </div>

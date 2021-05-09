@@ -80,13 +80,8 @@ export default {
       btnWidthPercent = percentBtn.toFixed(1)
     }
     // click
-    $rangeInput.addEventListener('click', ev => {
+    $rangeInput.onclick = (ev) => {
       setBaseSizes()
-      // rangeWidth = $range.offsetWidth
-      // btnWidth = cursor.offsetWidth
-      // btnWidthHalf = btnWidth / 2
-      // const percentBtn = btnWidth / rangeWidth * 100
-      // btnWidthPercent = percentBtn.toFixed(1)
       if (ev.target !== ev.currentTarget) return
       if (rangeWidth - ev.offsetX < btnWidthHalf) {
         $cursor.style.left = 100 - btnWidthPercent + '%'
@@ -102,14 +97,9 @@ export default {
       const value = (ev.offsetX / rangeWidth) * 100
       $cursor.style.left = +styleLeft.toFixed(1) + '%'
       this.dataValue = +value.toFixed(1)
-    })
+    }
     this.hammer.on('panstart', () => {
       setBaseSizes()
-      // rangeWidth = $range.offsetWidth
-      // btnWidth = cursor.offsetWidth
-      // btnWidthHalf = btnWidth / 2
-      // const percentBtn = btnWidth / rangeWidth * 100
-      // btnWidthPercent = percentBtn.toFixed(1)
       leftBorder = $rangeInput.getBoundingClientRect().left
       rightBorder = $rangeInput.getBoundingClientRect().right
       leftBorderWithBtnHalf = leftBorder + btnWidthHalf
@@ -135,6 +125,7 @@ export default {
   },
   beforeDestroy() {
     this.hammer.destroy()
+    this.$refs.rangeInput.onclick = null
   }
 }
 </script>
