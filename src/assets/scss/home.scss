@@ -1,0 +1,12 @@
+.home {
+	padding-top: 30px;
+	// .home__row
+	&__row {
+		max-width: 300px;
+	}
+	&__nav {
+		margin-bottom: 40px;
+		display: flex;
+		align-items: center;
+	}
+}

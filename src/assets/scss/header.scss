@@ -1,0 +1,12 @@
+.header {
+	padding: 30px 0;
+	display: flex;
+	justify-content: center;
+	@media (max-width: 576px) {
+		padding: 20px 0;
+	}
+	&__link {
+		color: $blue;
+		text-transform: uppercase;
+	}
+}

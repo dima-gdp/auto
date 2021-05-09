@@ -1,8 +1,23 @@
 <template>
-  <div class="wrapper">
-    <div class="range" data-range="range" @click="test" ref="range">
-      <span class="range__btn" data-range="btn" ref="btn"></span>
+  <div class="range">
+    <div class="range__current">{{ dataValue }}%</div>
+    <div class="range__input" data-range="range__input" ref="rangeInput">
+      <span class="range__cursor" data-range="cursor" ref="cursor"></span>
     </div>
+    <ul class="range__values">
+      <li>
+        <button class="range__btn" @click="setDataValue(25)">25%</button>
+      </li>
+      <li>
+        <button class="range__btn" @click="setDataValue(50)">50%</button>
+      </li>
+      <li>
+        <button class="range__btn" @click="setDataValue(75)">75%</button>
+      </li>
+      <li>
+        <button class="range__btn" @click="setDataValue(100)">100%</button>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -16,108 +31,110 @@ export default {
       type: Number
     }
   },
-  data () {
+  data() {
     return {
-      width: null,
-      btnWidth: null,
-      btnWidthHalf: null,
-      btnWidthPercent: null,
-      btnWidthPercentHalf: null,
-      coords: null
+      hammer: null
     }
   },
   computed: {
     dataValue: {
-      get () {
+      get() {
         return this.value
       },
-      set (value) {
+      set(value) {
         this.$emit('input', value)
       }
     }
   },
   methods: {
-    test (ev) {
-      if (ev.target !== ev.currentTarget) return
-      if (this.width - ev.offsetX < this.btnWidthHalf) {
-        this.$refs.btn.style.left = 100 - this.btnWidthPercent + '%'
-        return 100
-      }
-      if (this.width - ev.offsetX > this.width - this.btnWidthHalf) {
-        this.$refs.btn.style.left = '0%'
-        return 0
-      }
-      this.$refs.btn.style.left = (ev.offsetX / this.width * 100) - this.btnWidthPercentHalf + '%'
-      this.dataValue = ev.offsetX / this.width * 100
-      this.coords = ev.offsetX
+    setDataValue(value) {
+      const $cursor = this.$refs.cursor
+      const rangeWidthWithoutCursor =
+        this.$refs.rangeInput.offsetWidth - $cursor.offsetWidth
+      const styleLeft = (rangeWidthWithoutCursor * value) / 100
+      const percentStyleLeft =
+        (styleLeft / this.$refs.rangeInput.offsetWidth) * 100
+      const cursorStyleLeft = percentStyleLeft.toFixed(1)
+      this.dataValue = value
+      $cursor.style.left = cursorStyleLeft + '%'
     }
   },
-  mounted () {
-    // this.width = this.$refs.range.offsetWidth
-    // const $btn = this.$refs.range.querySelector('[data-range="btn"]')
-    // this.btnWidth = $btn.offsetWidth
-    // this.btnWidthHalf = this.btnWidth / 2
-    // const percentBtn = this.btnWidth / this.width * 100
-    // this.btnWidthPercent = percentBtn.toFixed(1)
-    // this.btnWidthPercentHalf = this.btnWidthPercent / 2
-    const $range = this.$refs.range
-    const $btn = this.$refs.btn
+  mounted() {
+    const $rangeInput = this.$refs.rangeInput
+    const $cursor = this.$refs.cursor
     let rangeWidth
+    let leftBorderWithBtnHalf
     let btnWidth
     let btnWidthPercent
-    let btnWidthPercentHalf
+    let btnWidthHalf
+    let rangeWithoutBtn
     let leftBorder
-    // let rightBorder
-    $btn.style.left = this.dataValue + '%'
-    const hammer = new Hammer($btn)
-    hammer.on('panstart', () => {
-      rangeWidth = $range.offsetWidth
-      btnWidth = $btn.offsetWidth
-      const percentBtn = btnWidth / rangeWidth * 100
+    let rightBorder
+    $cursor.style.left = this.dataValue + '%'
+    this.hammer = new Hammer($cursor)
+    const setBaseSizes = () => {
+      rangeWidth = $rangeInput.offsetWidth
+      btnWidth = $cursor.offsetWidth
+      btnWidthHalf = btnWidth / 2
+      const percentBtn = (btnWidth / rangeWidth) * 100
       btnWidthPercent = percentBtn.toFixed(1)
-      const percentBtnHalf = btnWidthPercent / 2
-      btnWidthPercentHalf = percentBtnHalf.toFixed(1)
-      leftBorder = $range.getBoundingClientRect().left
-      // rightBorder = $range.getBoundingClientRect().right
-      // this.width = this.$refs.range.offsetWidth
-      // const $btn = this.$refs.btn
-      // this.btnWidth = $btn.offsetWidth
-      // const percentBtn = this.btnWidth / this.width * 100
-      // this.btnWidthPercent = percentBtn.toFixed(1)
-      // const percentBtnHalf = this.btnWidthPercent / 2
-      // this.btnWidthPercentHalf = percentBtnHalf.toFixed(1)
-      // leftBorder = this.$refs.range.getBoundingClientRect().left
+    }
+    // click
+    $rangeInput.addEventListener('click', ev => {
+      setBaseSizes()
+      // rangeWidth = $range.offsetWidth
+      // btnWidth = cursor.offsetWidth
+      // btnWidthHalf = btnWidth / 2
+      // const percentBtn = btnWidth / rangeWidth * 100
+      // btnWidthPercent = percentBtn.toFixed(1)
+      if (ev.target !== ev.currentTarget) return
+      if (rangeWidth - ev.offsetX < btnWidthHalf) {
+        $cursor.style.left = 100 - btnWidthPercent + '%'
+        this.dataValue = 100
+        return
+      }
+      if (rangeWidth - ev.offsetX > rangeWidth - btnWidthHalf) {
+        $cursor.style.left = '0%'
+        this.dataValue = 0
+        return 0
+      }
+      const styleLeft = ((ev.offsetX - btnWidthHalf) / rangeWidth) * 100
+      const value = (ev.offsetX / rangeWidth) * 100
+      $cursor.style.left = +styleLeft.toFixed(1) + '%'
+      this.dataValue = +value.toFixed(1)
     })
-    hammer.on('pan', (ev) => {
-      const percent = ((ev.center.x - leftBorder) / rangeWidth * 100) - btnWidthPercentHalf
-      this.dataValue = +percent.toFixed(1)
-      ev.target.style.left = percent.toFixed(1) + '%'
-      // this.dataValue = ((ev.center.x - leftBorder) / this.width * 100) - this.btnWidthPercentHalf
-      // ev.target.style.left = ((ev.center.x - leftBorder) / this.width * 100) - this.btnWidthPercentHalf + '%'
+    this.hammer.on('panstart', () => {
+      setBaseSizes()
+      // rangeWidth = $range.offsetWidth
+      // btnWidth = cursor.offsetWidth
+      // btnWidthHalf = btnWidth / 2
+      // const percentBtn = btnWidth / rangeWidth * 100
+      // btnWidthPercent = percentBtn.toFixed(1)
+      leftBorder = $rangeInput.getBoundingClientRect().left
+      rightBorder = $rangeInput.getBoundingClientRect().right
+      leftBorderWithBtnHalf = leftBorder + btnWidthHalf
+      rangeWithoutBtn = rangeWidth - btnWidth
     })
+    this.hammer.on('pan', ev => {
+      if (ev.center.x >= rightBorder - btnWidthHalf) {
+        $cursor.style.left = 100 - btnWidthPercent + '%'
+        this.dataValue = 100
+        return
+      }
+      if (ev.center.x <= leftBorder + btnWidthHalf) {
+        $cursor.style.left = 0 + '%'
+        this.dataValue = 0
+        return
+      }
+      const s = ev.center.x - leftBorderWithBtnHalf
+      const styleLeft = (s / rangeWidth) * 100
+      const value = (s / rangeWithoutBtn) * 100
+      this.dataValue = +value.toFixed(1)
+      ev.target.style.left = styleLeft.toFixed(1) + '%'
+    })
+  },
+  beforeDestroy() {
+    this.hammer.destroy()
   }
 }
 </script>
-
-<style lang="scss">
-.range {
-  width: 300px;
-  height: 26px;
-  background-color: green;
-  position: relative;
-  border-radius: 15px;
-  cursor: pointer;
-
-  &__btn {
-    position: absolute;
-    top: 50%;
-    left: 40px;
-    transform: translateY(-50%);
-    height: 40px;
-    width: 40px;
-    background-color: blueviolet;
-    border-radius: 100%;
-    cursor: pointer;
-  }
-}
-</style>
